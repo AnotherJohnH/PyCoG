@@ -1,10 +1,11 @@
 #!/usr/bin/env Python3
 
-import Kbd
 import random
 import time
-from Frame import Frame
-from Sprite import Sprite
+
+import kbd
+import frame
+from sprite import Sprite
 
 # Game configuration
 PLAYER      = 'S'
@@ -15,34 +16,34 @@ NUM_BOWMEN  = 10
 WRAP_ARROWS = False
 
 # Game data
-frame  = Frame(width = 50, height = 30)
-player = Sprite(frame, Frame.GREEN, PLAYER)
+buffer = frame.Frame(width = 50, height = 30)
+player = Sprite(buffer, frame.GREEN, PLAYER)
 bowmen = []
 arrows = []
 
 for _ in range(NUM_BOWMEN):
-   bowmen.append(Sprite(frame, Frame.CYAN, BOWMAN))
+   bowmen.append(Sprite(buffer, frame.CYAN, BOWMAN))
 
 # The game
 cycle = 0
 while True:
 
    if not player.alive:
-      frame.shout(Frame.RED, 'YOU DIED')
+      buffer.shout(frame.RED, 'YOU DIED')
       break
 
-   frame.redraw()
+   buffer.redraw()
 
-   k = Kbd.read(timeout = 0.05)
+   k = kbd.read(timeout = 0.05)
 
    hit = ' '
-   if k == Kbd.UP:
+   if k == kbd.UP:
       hit = player.move(0, -1)
-   elif k == Kbd.DOWN:
+   elif k == kbd.DOWN:
       hit = player.move(0, +1)
-   elif k == Kbd.LEFT:
+   elif k == kbd.LEFT:
       hit = player.move(-1, 0)
-   elif k == Kbd.RIGHT:
+   elif k == kbd.RIGHT:
       hit = player.move(+1, 0)
 
    if hit == BOWMAN:
@@ -56,7 +57,7 @@ while True:
    cycle = 0
 
    for arrow in arrows:
-      if arrow.num_moves == (frame.height - 2):
+      if arrow.num_moves == (buffer.height - 2):
          arrow.kill()
       else:
          hit = arrow.integrate(WRAP_ARROWS)
@@ -71,14 +72,14 @@ while True:
    arrows = Sprite.listRemoveTheDead(arrows)
 
    if bowmen == []:
-      frame.shout(Frame.GREEN, 'YOU WIN')
+      buffer.shout(frame.GREEN, 'YOU WIN')
       break
 
    bowman = random.choice(bowmen)
    vx     = random.randint(-1,1)
    vy     = random.randint(-1,1)
    if vx != 0 or vy != 0:
-      arrow = Sprite(frame, Frame.RED, ARROW,
+      arrow = Sprite(buffer, frame.RED, ARROW,
                      bowman.x + vx, bowman.y + vy)
       arrow.setSpeed(vx, vy)
       arrows.append(arrow)

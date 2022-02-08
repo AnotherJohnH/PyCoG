@@ -1,58 +1,22 @@
 
-current_fg_colour = 7
-current_bg_colour = 0
-
-def printEsc(cmd):
-   ''' Emit an escape sequence '''
-   print('\033' + cmd, end='')
-
-def printCursor(visible):
-   ''' Control cursor visibility '''
-   printEsc('[?25' + ('h' if visible else 'l'))
-
-def printFgColour(fg_colour):
-   ''' Set the current foreground colour '''
-   printEsc('[1;3'+str(fg_colour)+'m')
-   global current_fg_colour
-   current_fg_colour = fg_colour
-
-def printBgColour(bg_colour):
-   ''' Set the current background colour '''
-   printEsc('[1;4'+str(bg_colour)+'m')
-   global current_bg_colour
-   current_bg_colour = bg_colour
-
-def printHome():
-   ''' Move cursor to top left corner '''
-   printEsc('[0;0H')
-   printFgColour(7)
-   printBgColour(0)
-
-def printText(text, fg = 7, bg = 0):
-   ''' Print text with the specified colour '''
-   if fg != current_fg_colour:
-      printFgColour(fg)
-   if bg != current_bg_colour:
-      printBgColour(bg)
-   print(text, end='')
+# Colour constants
+BLACK   = 0
+RED     = 1
+GREEN   = 2
+YELLOW  = 3
+BLUE    = 4
+MAGENTA = 5
+CYAN    = 6
+WHITE   = 7
 
 class Frame:
-
-   BLACK   = 0
-   RED     = 1
-   GREEN   = 2
-   YELLOW  = 3
-   BLUE    = 4
-   MAGENTA = 5
-   CYAN    = 6
-   WHITE   = 7
+   ''' ANSI Terminal Frame Buffer '''
 
    def __init__(self, width, height, border = False):
       ''' Construct a new frame '''
 
-      self.sprite_list = []
-      self.width       = width
-      self.height      = height
+      self.width  = width
+      self.height = height
 
       if border:
          self.horz_border  = '+' + '-'*self.width + '+'
@@ -70,16 +34,13 @@ class Frame:
    def __del__(self):
       printCursor(visible = True)
 
-   def add(self, sprite):
-      self.sprite_list.append(sprite)
-
    def clear(self, bg = BLACK):
       ''' Clear frame to empty '''
       self.frame  = []
       for row in range(self.height):
          line = []
          for cell in range(self.width):
-            line.append([' ', Frame.WHITE, bg])
+            line.append([' ', WHITE, bg])
          self.frame.append(line)
 
    def plot(self, x, y, fg, text, bg = BLACK):
@@ -131,3 +92,41 @@ class Frame:
             printText(cell[0], fg=cell[1], bg=cell[2])
          printText(self.right_border + '\n')
       printText(self.horz_border + '\n')
+
+def printEsc(cmd):
+   ''' Emit an escape sequence '''
+   print('\033' + cmd, end='')
+
+def printCursor(visible):
+   ''' Control cursor visibility '''
+   printEsc('[?25' + ('h' if visible else 'l'))
+
+def printFgColour(fg_colour):
+   ''' Set the current foreground colour '''
+   printEsc('[1;3'+str(fg_colour)+'m')
+   global current_fg_colour
+   current_fg_colour = fg_colour
+
+def printBgColour(bg_colour):
+   ''' Set the current background colour '''
+   printEsc('[1;4'+str(bg_colour)+'m')
+   global current_bg_colour
+   current_bg_colour = bg_colour
+
+def printHome():
+   ''' Move cursor to top left corner '''
+   printEsc('[0;0H')
+   printFgColour(WHITE)
+   printBgColour(BLACK)
+
+def printText(text, fg = WHITE, bg = BLACK):
+   ''' Print text with the specified colours '''
+   if fg != current_fg_colour:
+      printFgColour(fg)
+   if bg != current_bg_colour:
+      printBgColour(bg)
+   print(text, end='')
+
+# global state
+current_fg_colour = WHITE
+current_bg_colour = BLACK

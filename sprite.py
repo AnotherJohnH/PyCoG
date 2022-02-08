@@ -1,30 +1,30 @@
 
 import random
-from Frame import Frame
+import frame
 
 class Sprite:
 
-   def __init__(self, frame, fg_colour, text,
-                x = -1, y = -1, bg_colour = Frame.BLACK):
+   def __init__(self, buffer, fg_colour, text,
+                x = -1, y = -1, bg_colour = frame.BLACK):
       ''' Construct a new Sprite '''
 
       if x == -1 or y == -1:
          while True:
             if x == -1:
-               x = random.randint(0, frame.width  - 1)
+               x = random.randint(0, buffer.width  - 1)
             if y == -1:
-               y = random.randint(0, frame.height - 1)
-            if frame.peek(x, y) == ' ':
+               y = random.randint(0, buffer.height - 1)
+            if buffer.peek(x, y) == ' ':
                break
 
       if not type(text) is list:
          text = [text]
 
-      self.frame     = frame
-      self.x, self.y = frame.clip(x, y, wrap = False)
+      self.buffer    = buffer 
+      self.x, self.y = buffer.clip(x, y, wrap = False)
       self.fg_colour = fg_colour
       self.bg_colour = bg_colour
-      self.fr_colour = Frame.BLACK
+      self.fr_colour = frame.BLACK
       self.text      = text
       self.untext    = ''
       self.inst      = 0
@@ -50,19 +50,18 @@ class Sprite:
                self.height = y
 
       self.plot()
-      frame.add(self)
 
    def plot(self):
       ''' Plot the sprite '''
-      self.frame.plot(self.x, self.y,    
-                      self.fg_colour,
-                      self.text[self.inst], self.bg_colour)
+      self.buffer.plot(self.x, self.y,    
+                       self.fg_colour,
+                       self.text[self.inst], self.bg_colour)
 
-   def erase(self, bg_colour = Frame.BLACK):
+   def erase(self, bg_colour = frame.BLACK):
       ''' Erase the sprite '''
-      self.frame.plot(self.x, self.y,
-                      self.fg_colour,
-                      self.untext, self.fr_colour)
+      self.buffer.plot(self.x, self.y,
+                       self.fg_colour,
+                       self.untext, self.fr_colour)
 
    def setVisibile(visible = True):
       ''' Change sprite visibility '''
@@ -90,7 +89,7 @@ class Sprite:
       ''' Move the sprite '''
       x = self.x + dx
       y = self.y + dy
-      x, y = self.frame.clip(x, y, wrap)
+      x, y = self.buffer.clip(x, y, wrap)
 
       if x == self.x and y == self.y:
          return 'STUCK'
@@ -100,7 +99,7 @@ class Sprite:
          self.inst = 0
       self.num_moves += 1
 
-      prev = self.frame.peek(x, y)
+      prev = self.buffer.peek(x, y)
       self.setPos(x, y)
       return prev
 
