@@ -1,4 +1,6 @@
-import keys
+#!/usr/bin/env Python3
+
+import Kbd
 import random
 import time
 from Frame import Frame
@@ -31,16 +33,16 @@ while True:
 
   frame.redraw()
 
-  k = keys.read(timeout = 0.05)
+  k = Kbd.read(timeout = 0.05)
 
   hit = ' '
-  if k == keys.UP:
+  if k == Kbd.UP:
     hit = player.move(0, -1)
-  elif k == keys.DOWN:
+  elif k == Kbd.DOWN:
     hit = player.move(0, +1)
-  elif k == keys.LEFT:
+  elif k == Kbd.LEFT:
     hit = player.move(-1, 0)
-  elif k == keys.RIGHT:
+  elif k == Kbd.RIGHT:
     hit = player.move(+1, 0)
 
   if hit == BOWMAN:
