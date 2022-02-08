@@ -10,7 +10,7 @@ from Sprite import Sprite
 PLAYER      = 'S'
 BOWMAN      = 'B'
 DEAD        = '#'
-ARROW       = '*'
+ARROW       = ['/', '|', '\\', '-']
 NUM_BOWMEN  = 10
 WRAP_ARROWS = False
 

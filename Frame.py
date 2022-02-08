@@ -50,6 +50,7 @@ class Frame:
   def __init__(self, width, height, border = False):
     ''' Construct a new frame '''
 
+    self.sprite_list = []
     self.width       = width
     self.height      = height
 
@@ -67,7 +68,10 @@ class Frame:
     self.redraw()
 
   def __del__(self):
-    printCusrsor(visible = True)
+    printCursor(visible = True)
+
+  def add(self, sprite):
+    self.sprite_list.append(sprite)
 
   def clear(self, bg = BLACK):
     ''' Clear frame to empty '''

@@ -50,6 +50,7 @@ class Sprite:
           self.height = y
 
     self.plot()
+    frame.add(self)
 
   def plot(self):
     ''' Plot the sprite '''
