@@ -17,24 +17,24 @@ PLAYER = 0
 BOWMAN = 1
 ARROW  = 2
 
-buffer = frame.Frame(width = 50, height = 30)
-player = Sprite(PLAYER, buffer, frame.GREEN, 'S')
+# Game code
+screen = frame.Frame(width = 50, height = 30)
+player = Sprite(PLAYER, screen, frame.GREEN, 'S')
 
 for _ in range(NUM_BOWMEN):
-   Sprite(BOWMAN, buffer, frame.CYAN, 'B')
+   Sprite(BOWMAN, screen, frame.CYAN, 'B')
 
 cycle = 0
 
-# The game
 while True:
 
-   if not player.alive:
-      buffer.shout(frame.RED, 'YOU DIED')
-      break
+   screen.clear()
+   Sprite.redrawAll(screen)
+   screen.redraw()
 
-   buffer.clear()
-   Sprite.redrawAll(buffer)
-   buffer.redraw()
+   if not player.alive:
+      screen.shout(frame.RED, 'YOU DIED')
+      break
 
    k = kbd.read(timeout = 0.05)
 
@@ -47,7 +47,7 @@ while True:
    elif k == kbd.RIGHT:
       hit = player.move(+1, 0)
    elif k == 'q':
-      buffer.shout(frame.YELLOW, 'BYE BYE')
+      screen.shout(frame.YELLOW, 'BYE BYE')
       break
    else:
       hit = None
@@ -64,27 +64,27 @@ while True:
    cycle = 0
 
    for arrow in Sprite.listGet(ARROW):
-      if arrow.num_moves == (buffer.height - 2):
+      if arrow.num_moves == (screen.height - 2):
          arrow.kill()
       else:
          hit = arrow.integrate(WRAP_ARROWS)
-         if hit == 'STUCK':
+         if hit:
             arrow.kill()
-         elif hit:
-            hit.kill(DEAD)
+            if hit != 'STUCK':
+               hit.kill(DEAD)
 
    Sprite.listCull()
 
    bowmen = Sprite.listGet(BOWMAN)
 
    if bowmen == []:
-      buffer.shout(frame.GREEN, 'YOU WIN')
+      screen.shout(frame.GREEN, 'YOU WIN')
       break
 
    bowman = random.choice(bowmen)
    vx     = random.randint(-1,1)
    vy     = random.randint(-1,1)
    if vx != 0 or vy != 0:
-      arrow = Sprite(ARROW, buffer, frame.RED, ['/', '|', '\\', '-'],
+      arrow = Sprite(ARROW, screen, frame.RED, ['/', '|', '\\', '-'],
                      bowman.x + vx, bowman.y + vy)
       arrow.setSpeed(vx, vy)
