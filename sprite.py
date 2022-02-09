@@ -30,6 +30,7 @@ class Sprite:
       self.text      = text
       self.inst      = 0
       self.num_moves = 0
+      self.life_span = 0
       self.alive     = True
       self.height    = 0
       self.width     = 0
@@ -62,6 +63,10 @@ class Sprite:
       self.x = x
       self.y = y
 
+   def setLifeSpan(self, n):
+      ''' Set limited lifetime '''
+      self.life_span = n
+
    def hit(self, x, y):
       for key in Sprite.sprite_dict:
          for s in Sprite.sprite_dict[key]:
@@ -82,6 +87,8 @@ class Sprite:
       if self.inst == len(self.text):
          self.inst = 0
       self.num_moves += 1
+      if self.num_moves == self.life_span:
+         self.kill()
 
       self.setPos(x, y)
       return True, self.hit(x, y)

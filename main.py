@@ -64,14 +64,11 @@ while True:
    cycle = 0
 
    for arrow in Sprite.listGet(ARROW):
-      if arrow.num_moves == (screen.height - 2):
+      ok, hit = arrow.integrate(WRAP_ARROWS)
+      if not ok or hit:
          arrow.kill()
-      else:
-         ok, hit = arrow.integrate(WRAP_ARROWS)
-         if not ok or hit:
-            arrow.kill()
-            if hit:
-               hit.kill(DEAD)
+         if hit:
+            hit.kill(DEAD)
 
    Sprite.listCull()
 
@@ -88,3 +85,4 @@ while True:
       arrow = Sprite(ARROW, screen, frame.RED, ['/', '|', '\\', '-'],
                      bowman.x + vx, bowman.y + vy)
       arrow.setSpeed(vx, vy)
+      arrow.setLifeSpan(screen.height - 2)
