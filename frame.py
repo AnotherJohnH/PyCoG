@@ -19,13 +19,13 @@ class Frame:
       self.height = height
 
       if border:
-         self.horz_border  = '+' + '-'*self.width + '+'
+         self.horz_border  = '+' + '-'*self.width + '+\n'
          self.left_border  = '|'
-         self.right_border = '|'
+         self.right_border = '|\n'
       else:
          self.horz_border  = ''
          self.left_border  = ''
-         self.right_border = ''
+         self.right_border = '\n'
 
       self.frame = []
       for row in range(self.height):
@@ -35,6 +35,7 @@ class Frame:
          self.frame.append(line)
 
       printCursor(visible = False)
+      printClear()
       self.redraw()
 
    def __del__(self):
@@ -90,13 +91,13 @@ class Frame:
    def redraw(self):
       ''' Redraw frame on the console '''
       printHome()
-      printText(self.horz_border + '\n')
+      printText(self.horz_border)
       for line in self.frame:
          printText(self.left_border)
          for cell in line:
             printText(cell[0], fg=cell[1], bg=cell[2])
-         printText(self.right_border + '\n')
-      printText(self.horz_border + '\n')
+         printText(self.right_border)
+      printText(self.horz_border)
 
 def printEsc(cmd):
    ''' Emit an escape sequence '''
@@ -105,6 +106,11 @@ def printEsc(cmd):
 def printCursor(visible):
    ''' Control cursor visibility '''
    printEsc('[?25' + ('h' if visible else 'l'))
+
+def printClear():
+   ''' Clear console '''
+   printEsc('[0;0H')
+   printEsc('[0J')
 
 def printFgColour(fg_colour):
    ''' Set the current foreground colour '''
