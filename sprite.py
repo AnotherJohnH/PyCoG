@@ -30,11 +30,10 @@ class Sprite:
       self.text      = text
       self.inst      = 0
       self.num_moves = 0
-      self.visible   = True
       self.alive     = True
-
       self.height    = 0
       self.width     = 0
+
       x = 0
       y = 0
       for ch in self.text[0]:
@@ -48,13 +47,10 @@ class Sprite:
             if y > self.height:
                self.height = y
 
+      # Add sprite to the dictionary
       if not key in Sprite.sprite_dict:
          Sprite.sprite_dict[key] = []
       Sprite.sprite_dict[key].append(self)
-
-   def setVisibile(visible = True):
-      ''' Change sprite visibility '''
-      self.visible = visible
 
    def setSpeed(self, vx, vy):
       ''' Change sprite velocity '''
@@ -66,6 +62,13 @@ class Sprite:
       self.x = x
       self.y = y
 
+   def hit(self, x, y):
+      for key in Sprite.sprite_dict:
+         for s in Sprite.sprite_dict[key]:
+            if s != self and x == s.x and y == s.y:
+               return s
+      return None
+
    def move(self, dx, dy, wrap = False):
       ''' Move the sprite '''
       x = self.x + dx
@@ -73,7 +76,7 @@ class Sprite:
       x, y = self.buffer.clip(x, y, wrap)
 
       if x == self.x and y == self.y:
-         return 'STUCK'
+         return False, None
 
       self.inst += 1
       if self.inst == len(self.text):
@@ -81,7 +84,7 @@ class Sprite:
       self.num_moves += 1
 
       self.setPos(x, y)
-      return self.hit(x, y)
+      return True, self.hit(x, y)
 
    def integrate(self, wrap = False):
       ''' Move sprite according to it's velocity '''
@@ -92,19 +95,12 @@ class Sprite:
       self.text  = [dead_text]
       self.inst  = 0
 
-   def hit(self, x, y):
-      for key in Sprite.sprite_dict:
-         for s in Sprite.sprite_dict[key]:
-            if s != self and x == s.x and y == s.y:
-               return s
-      return None
-
    @staticmethod
    def listGet(key):
+      ''' Get the list of sprites with the given key '''
       if key in Sprite.sprite_dict:
           return Sprite.sprite_dict[key]
       return []
-
 
    @staticmethod
    def listCull():
@@ -114,7 +110,7 @@ class Sprite:
 
    @staticmethod
    def redrawAll(buffer):
+      ''' Redraw all the sprites on the frame buffer '''
       for key in Sprite.sprite_dict:
          for s in Sprite.sprite_dict[key]:
-            if s.visible:
-               buffer.plot(s.x, s.y, s.text[s.inst], s.fg_colour, s.bg_colour)
+            buffer.plot(s.x, s.y, s.text[s.inst], s.fg_colour, s.bg_colour)

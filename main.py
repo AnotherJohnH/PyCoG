@@ -39,20 +39,20 @@ while True:
    k = kbd.read(timeout = 0.05)
 
    if k == kbd.UP:
-      hit = player.move(0, -1)
+      ok, hit = player.move(0, -1)
    elif k == kbd.DOWN:
-      hit = player.move(0, +1)
+      ok, hit = player.move(0, +1)
    elif k == kbd.LEFT:
-      hit = player.move(-1, 0)
+      ok, hit = player.move(-1, 0)
    elif k == kbd.RIGHT:
-      hit = player.move(+1, 0)
+      ok, hit = player.move(+1, 0)
    elif k == 'q':
       screen.shout(frame.YELLOW, 'BYE BYE')
       break
    else:
-      hit = None
+      ok, hit = True, None
 
-   if hit and hit != "STUCK":
+   if ok and hit:
       if hit.key == BOWMAN:
          hit.kill(DEAD)
       elif hit.key == ARROW:
@@ -67,10 +67,10 @@ while True:
       if arrow.num_moves == (screen.height - 2):
          arrow.kill()
       else:
-         hit = arrow.integrate(WRAP_ARROWS)
-         if hit:
+         ok, hit = arrow.integrate(WRAP_ARROWS)
+         if not ok or hit:
             arrow.kill()
-            if hit != 'STUCK':
+            if hit:
                hit.kill(DEAD)
 
    Sprite.listCull()
