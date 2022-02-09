@@ -101,7 +101,9 @@ class Sprite:
 
    @staticmethod
    def listGet(key):
-      return Sprite.sprite_dict[key]
+      if key in Sprite.sprite_dict:
+          return Sprite.sprite_dict[key]
+      return []
 
 
    @staticmethod
@@ -112,9 +114,7 @@ class Sprite:
 
    @staticmethod
    def redrawAll(buffer):
-      buffer.clear()
       for key in Sprite.sprite_dict:
          for s in Sprite.sprite_dict[key]:
             if s.visible:
                buffer.plot(s.x, s.y, s.text[s.inst], s.fg_colour, s.bg_colour)
-      buffer.redraw()

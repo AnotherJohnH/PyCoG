@@ -24,7 +24,6 @@ for _ in range(NUM_BOWMEN):
    Sprite(BOWMAN, buffer, frame.CYAN, 'B')
 
 cycle = 0
-arrows = []
 
 # The game
 while True:
@@ -33,7 +32,9 @@ while True:
       buffer.shout(frame.RED, 'YOU DIED')
       break
 
+   buffer.clear()
    Sprite.redrawAll(buffer)
+   buffer.redraw()
 
    k = kbd.read(timeout = 0.05)
 
@@ -62,7 +63,7 @@ while True:
       continue
    cycle = 0
 
-   for arrow in arrows:
+   for arrow in Sprite.listGet(ARROW):
       if arrow.num_moves == (buffer.height - 2):
          arrow.kill()
       else:
@@ -87,4 +88,3 @@ while True:
       arrow = Sprite(ARROW, buffer, frame.RED, ['/', '|', '\\', '-'],
                      bowman.x + vx, bowman.y + vy)
       arrow.setSpeed(vx, vy)
-      arrows.append(arrow)
