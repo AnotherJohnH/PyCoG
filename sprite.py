@@ -79,26 +79,29 @@ class Sprite:
 
    def move(self, dx, dy, wrap = False):
       ''' Move the sprite '''
+
+      self.num_moves += 1
+      if self.num_moves == self.life_span:
+         self.kill()
+
       x = self.x + dx
       y = self.y + dy
       x, y = self.buffer.clip(x, y, wrap)
 
       if x == self.x and y == self.y:
          self.moveBlocked()
-         return None
+         return
+
+      target = self.hit(x, y)
+      if target:
+         if not self.moveHit(target):
+            return
 
       self.inst += 1
       if self.inst == len(self.text):
          self.inst = 0
-      self.num_moves += 1
-      if self.num_moves == self.life_span:
-         self.kill()
 
       self.setPos(x, y)
-      target = self.hit(x, y)
-      if target:
-         self.moveHit(target)
-      return target
 
    def integrate(self, wrap = False):
       ''' Move sprite according to it's velocity '''
@@ -113,7 +116,7 @@ class Sprite:
       pass
 
    def moveHit(self, target):
-      pass
+      return True
 
    @staticmethod
    def listGet(key):
@@ -134,3 +137,4 @@ class Sprite:
          Sprite.dict[key] = [s for s in Sprite.dict[key] if s.alive]
          for s in Sprite.dict[key]:
             buffer.plot(s.x, s.y, s.text[s.inst], s.fg_colour, s.bg_colour)
+

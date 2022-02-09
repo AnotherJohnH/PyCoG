@@ -19,6 +19,7 @@ class Player(Sprite):
          target.kill(DEAD)
       elif target.id() == Arrow:
          self.kill(DEAD)
+      return True
 
 
 class Bowman(Sprite):
@@ -46,6 +47,7 @@ class Arrow(Sprite):
    def moveHit(self, target):
       self.kill()
       target.kill(DEAD)
+      return True
 
 
 # Game code
