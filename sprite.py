@@ -132,6 +132,7 @@ class Sprite:
    def redrawAll(buffer):
       ''' Redraw all the sprites on the frame buffer '''
       for key in Sprite.sprite_dict:
-         for s in Sprite.sprite_dict[key]:
+         lst = Sprite.sprite_dict[key]
+         lst = [s for s in lst if s.alive]
+         for s in lst:
             buffer.plot(s.x, s.y, s.text[s.inst], s.fg_colour, s.bg_colour)
-

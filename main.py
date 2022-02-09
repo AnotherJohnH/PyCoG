@@ -1,10 +1,8 @@
 #!/usr/bin/env Python3
 
 import random
-import time
 
-import kbd
-import frame
+import kbd, frame
 from sprite import Sprite
 
 # Game configuration
@@ -34,7 +32,8 @@ class Arrow(Sprite):
          vx = random.randint(-1,1)
          vy = random.randint(-1,1)
          if vx != 0 or vy !=0:
-            Sprite.__init__(self, screen, source.fg_colour,
+            Sprite.__init__(self, screen,
+                            source.fg_colour,
                             ['/', '|', '\\', '-'],
                             source.x + vx, source.y + vy)
             self.setLifeSpan(screen.height - 2)
@@ -52,7 +51,6 @@ class Arrow(Sprite):
 # Game code
 screen = frame.Frame(width = 50, height = 30)
 player = Player()
-
 for _ in range(NUM_BOWMEN):
    Bowman()
 
@@ -92,7 +90,7 @@ while True:
    for arrow in Sprite.listGet(Arrow):
       arrow.integrate(WRAP_ARROWS)
 
-   Sprite.listCull()
+   #Sprite.listCull()
 
    bowman_list = Sprite.listGet(Bowman)
 
