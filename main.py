@@ -8,35 +8,35 @@ import frame
 from sprite import Sprite
 
 # Game configuration
-PLAYER      = 'S'
-BOWMAN      = 'B'
-DEAD        = '#'
-ARROW       = ['/', '|', '\\', '-']
 NUM_BOWMEN  = 10
 WRAP_ARROWS = False
+DEAD        = '#'
 
 # Game data
+PLAYER = 0
+BOWMAN = 1
+ARROW  = 2
+
 buffer = frame.Frame(width = 50, height = 30)
-player = Sprite(buffer, frame.GREEN, PLAYER)
-bowmen = []
-arrows = []
+player = Sprite(PLAYER, buffer, frame.GREEN, 'S')
 
 for _ in range(NUM_BOWMEN):
-   bowmen.append(Sprite(buffer, frame.CYAN, BOWMAN))
+   Sprite(BOWMAN, buffer, frame.CYAN, 'B')
+
+cycle = 0
+arrows = []
 
 # The game
-cycle = 0
 while True:
 
    if not player.alive:
       buffer.shout(frame.RED, 'YOU DIED')
       break
 
-   buffer.redraw()
+   Sprite.redrawAll(buffer)
 
    k = kbd.read(timeout = 0.05)
 
-   hit = ' '
    if k == kbd.UP:
       hit = player.move(0, -1)
    elif k == kbd.DOWN:
@@ -45,11 +45,17 @@ while True:
       hit = player.move(-1, 0)
    elif k == kbd.RIGHT:
       hit = player.move(+1, 0)
+   elif k == 'q':
+      buffer.shout(frame.YELLOW, 'BYE BYE')
+      break
+   else:
+      hit = None
 
-   if hit == BOWMAN:
-      Sprite.listKillAt(bowmen, player.x, player.y, DEAD)
-   elif hit == ARROW:
-      player.kill(DEAD)
+   if hit and hit != "STUCK":
+      if hit.key == BOWMAN:
+         hit.kill(DEAD)
+      elif hit.key == ARROW:
+         player.kill(DEAD)
 
    cycle += 1
    if cycle < 5:
@@ -61,15 +67,14 @@ while True:
          arrow.kill()
       else:
          hit = arrow.integrate(WRAP_ARROWS)
-         if hit == PLAYER:
-            player.kill(DEAD)
-         elif hit == BOWMAN:
-            Sprite.listKillAt(bowmen, arrow.x, arrow.y, DEAD)
-         elif hit == 'STUCK':
+         if hit == 'STUCK':
             arrow.kill()
+         elif hit:
+            hit.kill(DEAD)
 
-   bowmen = Sprite.listRemoveTheDead(bowmen)
-   arrows = Sprite.listRemoveTheDead(arrows)
+   Sprite.listCull()
+
+   bowmen = Sprite.listGet(BOWMAN)
 
    if bowmen == []:
       buffer.shout(frame.GREEN, 'YOU WIN')
@@ -79,7 +84,7 @@ while True:
    vx     = random.randint(-1,1)
    vy     = random.randint(-1,1)
    if vx != 0 or vy != 0:
-      arrow = Sprite(buffer, frame.RED, ARROW,
+      arrow = Sprite(ARROW, buffer, frame.RED, ['/', '|', '\\', '-'],
                      bowman.x + vx, bowman.y + vy)
       arrow.setSpeed(vx, vy)
       arrows.append(arrow)

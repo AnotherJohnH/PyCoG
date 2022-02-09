@@ -27,8 +27,14 @@ class Frame:
          self.left_border  = ''
          self.right_border = ''
 
+      self.frame = []
+      for row in range(self.height):
+         line = []
+         for cell in range(self.width):
+            line.append([' ', WHITE, BLACK])
+         self.frame.append(line)
+
       printCursor(visible = False)
-      self.clear()
       self.redraw()
 
    def __del__(self):
@@ -36,14 +42,13 @@ class Frame:
 
    def clear(self, bg = BLACK):
       ''' Clear frame to empty '''
-      self.frame  = []
-      for row in range(self.height):
-         line = []
-         for cell in range(self.width):
-            line.append([' ', WHITE, bg])
-         self.frame.append(line)
+      for row in self.frame:
+         for cell in row:
+            cell[0] = ' '
+            cell[1] = WHITE
+            cell[2] = bg
 
-   def plot(self, x, y, fg, text, bg = BLACK):
+   def plot(self, x, y, text, fg = WHITE, bg = BLACK):
       ''' Print text on the frame '''
       start_x = x
       for char in text:
@@ -63,7 +68,7 @@ class Frame:
       for ch in text + ' !!!!':
          louder_text += ch + ' '
       x = (self.width - len(louder_text)) // 2
-      self.plot(x, 10, colour, louder_text)
+      self.plot(x, 10, louder_text, colour)
       self.redraw()
 
    def peek(self, x, y):

@@ -4,7 +4,9 @@ import frame
 
 class Sprite:
 
-   def __init__(self, buffer, fg_colour, text,
+   sprite_dict = {}
+
+   def __init__(self, key, buffer, fg_colour, text,
                 x = -1, y = -1, bg_colour = frame.BLACK):
       ''' Construct a new Sprite '''
 
@@ -20,13 +22,12 @@ class Sprite:
       if not type(text) is list:
          text = [text]
 
+      self.key       = key
       self.buffer    = buffer 
       self.x, self.y = buffer.clip(x, y, wrap = False)
       self.fg_colour = fg_colour
       self.bg_colour = bg_colour
-      self.fr_colour = frame.BLACK
       self.text      = text
-      self.untext    = ''
       self.inst      = 0
       self.num_moves = 0
       self.visible   = True
@@ -38,38 +39,22 @@ class Sprite:
       y = 0
       for ch in self.text[0]:
          if ch == '\n':
-            self.untext += '\n'
             self.height += 1
             x = 0
          else:
-            self.untext += ' '
             x += 1
             if x > self.width:
                self.width = x
             if y > self.height:
                self.height = y
 
-      self.plot()
-
-   def plot(self):
-      ''' Plot the sprite '''
-      self.buffer.plot(self.x, self.y,    
-                       self.fg_colour,
-                       self.text[self.inst], self.bg_colour)
-
-   def erase(self, bg_colour = frame.BLACK):
-      ''' Erase the sprite '''
-      self.buffer.plot(self.x, self.y,
-                       self.fg_colour,
-                       self.untext, self.fr_colour)
+      if not key in Sprite.sprite_dict:
+         Sprite.sprite_dict[key] = []
+      Sprite.sprite_dict[key].append(self)
 
    def setVisibile(visible = True):
       ''' Change sprite visibility '''
       self.visible = visible
-      if self.visible:
-          self.plot()
-      else:
-          self.erase()
 
    def setSpeed(self, vx, vy):
       ''' Change sprite velocity '''
@@ -78,12 +63,8 @@ class Sprite:
    
    def setPos(self, x, y):
       ''' Change sprite position '''
-      if self.visible:
-         self.erase()
       self.x = x
       self.y = y
-      if self.visible:
-         self.plot()
 
    def move(self, dx, dy, wrap = False):
       ''' Move the sprite '''
@@ -99,9 +80,8 @@ class Sprite:
          self.inst = 0
       self.num_moves += 1
 
-      prev = self.buffer.peek(x, y)
       self.setPos(x, y)
-      return prev
+      return self.hit(x, y)
 
    def integrate(self, wrap = False):
       ''' Move sprite according to it's velocity '''
@@ -111,14 +91,30 @@ class Sprite:
       self.alive = False
       self.text  = [dead_text]
       self.inst  = 0
-      self.plot()
+
+   def hit(self, x, y):
+      for key in Sprite.sprite_dict:
+         for s in Sprite.sprite_dict[key]:
+            if s != self and x == s.x and y == s.y:
+               return s
+      return None
 
    @staticmethod
-   def listKillAt(list_of_sprites, x, y, dead_text = ' '):
-      for sprite in list_of_sprites:
-         if sprite.x == x and sprite.y == y:
-            sprite.kill(dead_text)
-  
+   def listGet(key):
+      return Sprite.sprite_dict[key]
+
+
    @staticmethod
-   def listRemoveTheDead(list_of_sprites):
-      return [sprite for sprite in list_of_sprites if sprite.alive]
+   def listCull():
+      ''' Remove all the dead sprites '''
+      for key in Sprite.sprite_dict:
+          Sprite.sprite_dict[key] = [s for s in Sprite.sprite_dict[key] if s.alive]
+
+   @staticmethod
+   def redrawAll(buffer):
+      buffer.clear()
+      for key in Sprite.sprite_dict:
+         for s in Sprite.sprite_dict[key]:
+            if s.visible:
+               buffer.plot(s.x, s.y, s.text[s.inst], s.fg_colour, s.bg_colour)
+      buffer.redraw()
