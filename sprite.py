@@ -6,7 +6,7 @@ class Sprite:
 
    sprite_dict = {}
 
-   def __init__(self, key, buffer, fg_colour, text,
+   def __init__(self, buffer, fg_colour, text,
                 x = -1, y = -1, bg_colour = frame.BLACK):
       ''' Construct a new Sprite '''
 
@@ -22,7 +22,6 @@ class Sprite:
       if not type(text) is list:
          text = [text]
 
-      self.key       = key
       self.buffer    = buffer 
       self.x, self.y = buffer.clip(x, y, wrap = False)
       self.fg_colour = fg_colour
@@ -49,9 +48,13 @@ class Sprite:
                self.height = y
 
       # Add sprite to the dictionary
+      key = self.id()
       if not key in Sprite.sprite_dict:
          Sprite.sprite_dict[key] = []
       Sprite.sprite_dict[key].append(self)
+
+   def id(self):
+      return self.__class__
 
    def setSpeed(self, vx, vy):
       ''' Change sprite velocity '''
@@ -81,7 +84,8 @@ class Sprite:
       x, y = self.buffer.clip(x, y, wrap)
 
       if x == self.x and y == self.y:
-         return False, None
+         self.moveBlocked()
+         return None
 
       self.inst += 1
       if self.inst == len(self.text):
@@ -91,7 +95,10 @@ class Sprite:
          self.kill()
 
       self.setPos(x, y)
-      return True, self.hit(x, y)
+      target = self.hit(x, y)
+      if target:
+         self.moveHit(target)
+      return target
 
    def integrate(self, wrap = False):
       ''' Move sprite according to it's velocity '''
@@ -101,6 +108,12 @@ class Sprite:
       self.alive = False
       self.text  = [dead_text]
       self.inst  = 0
+
+   def moveBlocked(self):
+      pass
+
+   def moveHit(self, target):
+      pass
 
    @staticmethod
    def listGet(key):
@@ -121,3 +134,4 @@ class Sprite:
       for key in Sprite.sprite_dict:
          for s in Sprite.sprite_dict[key]:
             buffer.plot(s.x, s.y, s.text[s.inst], s.fg_colour, s.bg_colour)
+

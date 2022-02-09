@@ -12,17 +12,49 @@ NUM_BOWMEN  = 10
 WRAP_ARROWS = False
 DEAD        = '#'
 
-# Game data
-PLAYER = 0
-BOWMAN = 1
-ARROW  = 2
+class Player(Sprite):
+   def __init__(self):
+      Sprite.__init__(self, screen, frame.GREEN, 'S')
+
+   def moveHit(self, target):
+      if target.id() == Bowman:
+         target.kill(DEAD)
+      elif target.id() == Arrow:
+         self.kill(DEAD)
+
+
+class Bowman(Sprite):
+   def __init__(self):
+      Sprite.__init__(self, screen, frame.CYAN, 'B')
+
+
+class Arrow(Sprite):
+   def __init__(self, source):
+      while True:
+         vx = random.randint(-1,1)
+         vy = random.randint(-1,1)
+         if vx != 0 or vy !=0:
+            Sprite.__init__(self, screen, source.fg_colour,
+                            ['/', '|', '\\', '-'],
+                            source.x + vx, source.y + vy)
+            self.setLifeSpan(screen.height - 2)
+            self.setSpeed(vx, vy)
+            break
+
+   def moveBlocked(self):
+      self.kill()
+
+   def moveHit(self, target):
+      self.kill()
+      target.kill(DEAD)
+
 
 # Game code
 screen = frame.Frame(width = 50, height = 30)
-player = Sprite(PLAYER, screen, frame.GREEN, 'S')
+player = Player()
 
 for _ in range(NUM_BOWMEN):
-   Sprite(BOWMAN, screen, frame.CYAN, 'B')
+   Bowman()
 
 cycle = 0
 
@@ -39,50 +71,34 @@ while True:
    k = kbd.read(timeout = 0.05)
 
    if k == kbd.UP:
-      ok, hit = player.move(0, -1)
+      player.move(0, -1)
    elif k == kbd.DOWN:
-      ok, hit = player.move(0, +1)
+      player.move(0, +1)
    elif k == kbd.LEFT:
-      ok, hit = player.move(-1, 0)
+      player.move(-1, 0)
    elif k == kbd.RIGHT:
-      ok, hit = player.move(+1, 0)
+      player.move(+1, 0)
+   elif k == 'f':
+      Arrow(player)
    elif k == 'q':
       screen.shout(frame.YELLOW, 'BYE BYE')
       break
-   else:
-      ok, hit = True, None
-
-   if ok and hit:
-      if hit.key == BOWMAN:
-         hit.kill(DEAD)
-      elif hit.key == ARROW:
-         player.kill(DEAD)
 
    cycle += 1
    if cycle < 5:
       continue
    cycle = 0
 
-   for arrow in Sprite.listGet(ARROW):
-      ok, hit = arrow.integrate(WRAP_ARROWS)
-      if not ok or hit:
-         arrow.kill()
-         if hit:
-            hit.kill(DEAD)
+   for arrow in Sprite.listGet(Arrow):
+      arrow.integrate(WRAP_ARROWS)
 
    Sprite.listCull()
 
-   bowmen = Sprite.listGet(BOWMAN)
+   bowman_list = Sprite.listGet(Bowman)
 
-   if bowmen == []:
+   if bowman_list == []:
       screen.shout(frame.GREEN, 'YOU WIN')
       break
 
-   bowman = random.choice(bowmen)
-   vx     = random.randint(-1,1)
-   vy     = random.randint(-1,1)
-   if vx != 0 or vy != 0:
-      arrow = Sprite(ARROW, screen, frame.RED, ['/', '|', '\\', '-'],
-                     bowman.x + vx, bowman.y + vy)
-      arrow.setSpeed(vx, vy)
-      arrow.setLifeSpan(screen.height - 2)
+   bowman = random.choice(bowman_list)
+   Arrow(bowman)
