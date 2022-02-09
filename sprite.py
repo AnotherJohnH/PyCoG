@@ -4,7 +4,7 @@ import frame
 
 class Sprite:
 
-   sprite_dict = {}
+   dict = {}
 
    def __init__(self, buffer, fg_colour, text,
                 x = -1, y = -1, bg_colour = frame.BLACK):
@@ -49,9 +49,9 @@ class Sprite:
 
       # Add sprite to the dictionary
       key = self.id()
-      if not key in Sprite.sprite_dict:
-         Sprite.sprite_dict[key] = []
-      Sprite.sprite_dict[key].append(self)
+      if not key in Sprite.dict:
+         Sprite.dict[key] = []
+      Sprite.dict[key].append(self)
 
    def id(self):
       return self.__class__
@@ -71,8 +71,8 @@ class Sprite:
       self.life_span = n
 
    def hit(self, x, y):
-      for key in Sprite.sprite_dict:
-         for s in Sprite.sprite_dict[key]:
+      for key in Sprite.dict:
+         for s in Sprite.dict[key]:
             if s != self and x == s.x and y == s.y:
                return s
       return None
@@ -118,21 +118,19 @@ class Sprite:
    @staticmethod
    def listGet(key):
       ''' Get the list of sprites with the given key '''
-      if key in Sprite.sprite_dict:
-          return Sprite.sprite_dict[key]
+      if key in Sprite.dict:
+          return Sprite.dict[key]
       return []
 
    @staticmethod
-   def listCull():
-      ''' Remove all the dead sprites '''
-      for key in Sprite.sprite_dict:
-          Sprite.sprite_dict[key] = [s for s in Sprite.sprite_dict[key] if s.alive]
+   def listEmpty(key):
+      ''' Check if any sprites of a type exist '''
+      return Sprite.listGet(key) == []
 
    @staticmethod
    def redrawAll(buffer):
       ''' Redraw all the sprites on the frame buffer '''
-      for key in Sprite.sprite_dict:
-         lst = Sprite.sprite_dict[key]
-         lst = [s for s in lst if s.alive]
-         for s in lst:
+      for key in Sprite.dict:
+         Sprite.dict[key] = [s for s in Sprite.dict[key] if s.alive]
+         for s in Sprite.dict[key]:
             buffer.plot(s.x, s.y, s.text[s.inst], s.fg_colour, s.bg_colour)

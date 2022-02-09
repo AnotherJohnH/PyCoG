@@ -79,7 +79,7 @@ while True:
    elif k == 'f':
       Arrow(player)
    elif k == 'q':
-      screen.shout(frame.YELLOW, 'BYE BYE')
+      screen.shout(frame.YELLOW, 'Bye Bye')
       break
 
    cycle += 1
@@ -90,13 +90,9 @@ while True:
    for arrow in Sprite.listGet(Arrow):
       arrow.integrate(WRAP_ARROWS)
 
-   #Sprite.listCull()
-
-   bowman_list = Sprite.listGet(Bowman)
-
-   if bowman_list == []:
+   if Sprite.listEmpty(Bowman):
       screen.shout(frame.GREEN, 'YOU WIN')
       break
 
-   bowman = random.choice(bowman_list)
+   bowman = random.choice(Sprite.listGet(Bowman))
    Arrow(bowman)
