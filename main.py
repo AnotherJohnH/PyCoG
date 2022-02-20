@@ -12,7 +12,8 @@ DEAD        = '#'
 
 class Player(Sprite):
    def __init__(self):
-      Sprite.__init__(self, screen, frame.GREEN, 'S')
+      Sprite.__init__(self, 'S', frame.GREEN)
+      self.setRandomPos(screen)
 
    def moveHit(self, target):
       if target.id() == Bowman:
@@ -24,7 +25,8 @@ class Player(Sprite):
 
 class Bowman(Sprite):
    def __init__(self):
-      Sprite.__init__(self, screen, frame.CYAN, 'B')
+      Sprite.__init__(self, 'B', frame.CYAN)
+      self.setRandomPos(screen)
 
 
 class Arrow(Sprite):
@@ -33,13 +35,16 @@ class Arrow(Sprite):
          vx = random.randint(-1,1)
          vy = random.randint(-1,1)
          if vx != 0 or vy !=0:
-            Sprite.__init__(self, screen,
-                            source.fg_colour,
+            Sprite.__init__(self,
                             ['/', '|', '\\', '-'],
+                            source.fg_colour,
                             source.x + vx, source.y + vy)
-            self.setLifeSpan(screen.height - 2)
             self.setSpeed(vx, vy)
             break
+
+   def spriteUpdate(self):
+      if self.num_move >= screen.height - 1:
+         self.kill()
 
    def moveBlocked(self):
       self.kill()
